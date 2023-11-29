@@ -35,7 +35,6 @@ class VectorStoreComponent(metaclass=SingletonMetaClass):
         context_filter: ContextFilter | None = None,
         similarity_top_k: int = 2,
     ) -> VectorIndexRetriever:
-        # TODO this 'where' is specific to chromadb. Implement other vector stores
         return VectorIndexRetriever(
             index=index,
             similarity_top_k=similarity_top_k,
