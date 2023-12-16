@@ -41,8 +41,8 @@ class AppSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="redis_")
 
-    # dsn: RedisDsn = "redis://redis:6379"
     host: str = "localhost"
+    # host: str = "redis"
     port: int = 6379
     dsn: RedisDsn = f"redis://{host}:{port}"
 

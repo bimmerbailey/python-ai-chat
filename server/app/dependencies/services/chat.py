@@ -1,5 +1,6 @@
 from typing import Annotated
 
+import structlog.stdlib
 from fastapi import Depends
 from llama_index import ServiceContext, StorageContext, VectorStoreIndex
 from llama_index.chat_engine import ContextChatEngine
@@ -24,6 +25,9 @@ from app.dependencies.components import (
 from app.dependencies.services.chunks import Chunk
 
 
+logger = structlog.stdlib.get_logger(__name__)
+
+
 class Completion(BaseModel):
     response: str
     sources: list[Chunk] | None = None
@@ -37,16 +41,10 @@ class CompletionGen(BaseModel):
 class ChatService(metaclass=SingletonMetaClass):
     def __init__(
         self,
-        llm_component: Annotated[LLMComponent, Depends()] = get_llm_component(),
-        vector_store_component: Annotated[
-            VectorStoreComponent, Depends()
-        ] = get_vector_store_component(),
-        embedding_component: Annotated[
-            EmbeddingComponent, Depends()
-        ] = get_embeddings_component(),
-        node_store_component: Annotated[NodeStoreComponent, Depends()] = (
-            get_node_store_component(),
-        ),
+        llm_component: LLMComponent = get_llm_component(),
+        vector_store_component: VectorStoreComponent = get_vector_store_component(),
+        embedding_component: EmbeddingComponent = get_embeddings_component(),
+        node_store_component: NodeStoreComponent = get_node_store_component(),
     ) -> None:
         self.llm_service = llm_component
         self.vector_store_component = vector_store_component

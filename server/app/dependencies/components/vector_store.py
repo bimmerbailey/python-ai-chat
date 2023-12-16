@@ -19,7 +19,9 @@ class VectorStoreComponent(metaclass=SingletonMetaClass):
 
     def __init__(
         self,
-        milvus_settings: MilvusSettings = get_milvus_settings(),
+        milvus_settings: typing.Annotated[
+            MilvusSettings, Depends()
+        ] = get_milvus_settings(),
     ) -> None:
         self.vector_store = typing.cast(
             VectorStore,

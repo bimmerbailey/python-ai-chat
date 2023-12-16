@@ -51,7 +51,7 @@ dump() {
 }
 
 populate () {
-  docker compose run --rm server poetry run python development/populate.py
+  cd server && poetry run python development/populate.py
 }
 
 shell() {

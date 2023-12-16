@@ -39,9 +39,6 @@ class ChatBody(BaseModel):
                     "stream": False,
                     "use_context": True,
                     "include_sources": True,
-                    "context_filter": {
-                        "docs_ids": ["c202d5e6-7b69-4869-81cc-dd574ee8ee11"]
-                    },
                 }
             ]
         }
@@ -82,6 +79,7 @@ def chat_completion(
         ChatMessage(content=m.content, role=MessageRole(m.role)) for m in body.messages
     ]
     if body.stream:
+        logger.debug("Streaming messages")
         completion_gen = service.stream_chat(
             all_messages, body.use_context, body.context_filter
         )
