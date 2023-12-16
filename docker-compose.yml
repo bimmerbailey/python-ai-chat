@@ -19,6 +19,17 @@ services:
       - "./server/tests:/backend/tests"
       - "./server/development:/backend/development"
   
+  frontend:
+    build: 
+      context: ./frontend
+      target: development
+    volumes:
+      - "./frontend/src:/frontend/src"
+      - "./frontend/public:/frontend/public"
+      - "./frontend/vite.config.ts:/frontend/vite.config.ts"
+    ports:
+      - "3000:3000"
+  
   mongo:
     image: mongo:6.0.5
     environment:
