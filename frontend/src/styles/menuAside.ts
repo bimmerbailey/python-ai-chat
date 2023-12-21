@@ -1,6 +1,12 @@
 import { mdiAccountCircle, mdiMonitor , mdiChat} from '@mdi/js'
 
-export default [
+interface AsideMenu {
+  to: string
+  label: string
+  icon: string
+}
+
+export default <Array<AsideMenu>> [
   {
     to: '/',
     icon: mdiMonitor,

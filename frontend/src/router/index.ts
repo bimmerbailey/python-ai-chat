@@ -35,7 +35,7 @@ const router = createRouter({
     {
       meta: {
         title: 'Chat',
-        requiresAuth: true,
+        // requiresAuth: true,  FIXME: Temporary
       },
       path: '/chat',
       name: 'chat',
