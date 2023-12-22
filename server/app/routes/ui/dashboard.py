@@ -11,7 +11,7 @@ logger = structlog.stdlib.get_logger(__name__)
 router = APIRouter(tags=["Dashboard"], dependencies=[Depends(get_current_user)])
 
 
-@router.get("/dashboard", response_class=HTMLResponse)
+@router.get("/dashboard", response_class=HTMLResponse, name="dashboard")
 async def get_dashboard(
     request: Request,
 ):
