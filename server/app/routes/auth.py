@@ -3,7 +3,6 @@ from typing import Annotated
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from redis.asyncio import Redis
 from starlette.responses import RedirectResponse
@@ -14,14 +13,15 @@ from app.dependencies.auth import create_access_token, get_current_user
 from app.dependencies.crypt import verify
 from app.dependencies.session import init_redis_client
 from app.models.users import Users
-from app.schemas.users import Token, UserBase
+from app.schemas.users import UserBase
 
 router = APIRouter(tags=["Authentication"], prefix="/api")
 logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_class=RedirectResponse)
 async def login(
+    request: Request,
     # FIXME: We don't want to "init_redis_client" this every time
     redis: Annotated[Redis, Depends(init_redis_client)],
     user_credentials: OAuth2PasswordRequestForm = Depends(),
@@ -39,29 +39,10 @@ async def login(
             detail=f"Invalid Credentials",
         )
 
-    access_token = create_access_token(data={"user_id": str(auth_user.id)})
-
-    response = JSONResponse(
-        content={
-            "access_token": access_token,
-            "token_type": "bearer",
-            "is_admin": auth_user.is_admin,
-        }
+    request.session["user_id"] = str(auth_user.id)
+    return RedirectResponse(
+        request.url_for("dashboard"), status_code=status.HTTP_303_SEE_OTHER
     )
-    response.set_cookie(
-        key="token",
-        value=access_token,
-        expires=jwt_settings.token_expires * 60,
-        domain=app_settings.url_base,
-        httponly=True,
-        secure=True,
-    )
-    await redis.set(
-        str(auth_user.id),
-        json.dumps(auth_user.model_dump_json()),
-        3600,
-    )
-    return response
 
 
 @router.get("/logout")

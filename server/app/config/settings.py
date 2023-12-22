@@ -100,3 +100,8 @@ def get_s3_settings() -> S3Settings:
 @lru_cache
 def get_redis_settings() -> RedisSettings:
     return RedisSettings()
+
+
+@lru_cache
+def get_jwt_settings() -> JwtSettings:
+    return JwtSettings()
