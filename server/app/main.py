@@ -8,11 +8,7 @@ from app.config.logging import setup_fastapi, setup_logging
 from app.config.settings import AppSettings, get_app_settings
 from app.database.init_db import close_mongo_connection, connect_to_mongo
 from app.dependencies.session import close_redis_client, init_redis_client
-from app.routes.auth import router as auth_router
-from app.routes.chat import chat_router
-from app.routes.ingest import router as ingest_router
-from app.routes.upload import router as upload_router
-from app.routes.users import router as users_router
+from app.routes import auth_ui, dashboard_ui, auth_api, users_api, upload_api, chat_api, ingest_api
 
 
 @asynccontextmanager
@@ -44,10 +40,12 @@ def init_app(app_settings: AppSettings = get_app_settings()):
         allow_headers=["*"],
     )
     setup_fastapi(fast_app)
-    fast_app.include_router(auth_router)
-    fast_app.include_router(users_router)
-    fast_app.include_router(upload_router)
-    fast_app.include_router(ingest_router)
-    fast_app.include_router(chat_router)
+    fast_app.include_router(auth_ui)
+    fast_app.include_router(dashboard_ui)
+    fast_app.include_router(auth_api)
+    fast_app.include_router(users_api)
+    fast_app.include_router(upload_api)
+    fast_app.include_router(ingest_api)
+    fast_app.include_router(chat_api)
 
     return fast_app
