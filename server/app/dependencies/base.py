@@ -11,6 +11,7 @@ class ContextFilter(BaseModel):
 
 
 # TODO: This is untested
+#  not even sure this is really a singleton
 class SingletonMetaClass(type):
     _instances: ClassVar[dict] = {}
 

@@ -19,7 +19,6 @@ class CookieAuth(OAuth2PasswordBearer):
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Not authenticated",
-                    headers={"WWW-Authenticate": "Bearer"},
                 )
             else:
                 return None

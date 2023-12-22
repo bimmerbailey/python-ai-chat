@@ -22,6 +22,7 @@ logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
 
 @router.post("/login", response_model=Token)
 async def login(
+    # FIXME: We don't want to "init_redis_client" this every time
     redis: Annotated[Redis, Depends(init_redis_client)],
     user_credentials: OAuth2PasswordRequestForm = Depends(),
 ):
@@ -58,7 +59,7 @@ async def login(
     await redis.set(
         str(auth_user.id),
         json.dumps(auth_user.model_dump_json()),
-        jwt_settings.token_expires * 60,
+        3600,
     )
     return response
 

@@ -7,8 +7,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class MongoSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="mongo_")
-    # hostname: str = "mongo"
-    hostname: str = "localhost"
+    hostname: str = "mongo"
+    # hostname: str = "localhost"
     port: int = 27017
     password: str = "password"
     name: str = "rag_app"
@@ -41,8 +41,8 @@ class AppSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="redis_")
 
-    host: str = "localhost"
-    # host: str = "redis"
+    # host: str = "localhost"
+    host: str = "redis"
     port: int = 6379
     dsn: RedisDsn = f"redis://{host}:{port}"
 
@@ -50,8 +50,8 @@ class RedisSettings(BaseSettings):
 class MilvusSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="milvus_")
 
-    # uri: AnyHttpUrl = "http://milvus-db"
-    uri: AnyHttpUrl = f"http://localhost"
+    uri: AnyHttpUrl = "http://milvus-db"
+    # uri: AnyHttpUrl = f"http://localhost"
     hostname: str = str(uri).split("/")[-1]
     collection_name: str = "ragCollection"
     token: str = ""
@@ -67,8 +67,8 @@ class MilvusSettings(BaseSettings):
 class S3Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="s3_")
 
-    # uri: AnyHttpUrl = "http://minio:9000"
-    uri: AnyHttpUrl = "http://localhost:9000"
+    uri: AnyHttpUrl = "http://minio:9000"
+    # uri: AnyHttpUrl = "http://localhost:9000"
     bucket: str = "a-bucket"
     aws_access_key_id: str = "minioadmin"
     aws_secret_access_key: str = "minioadmin"
