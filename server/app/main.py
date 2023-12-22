@@ -13,6 +13,7 @@ from app.dependencies.session import close_redis_client, init_redis_client
 from app.routes import (
     auth_ui,
     dashboard_ui,
+    chat_ui,
     auth_api,
     users_api,
     upload_api,
@@ -59,6 +60,7 @@ def init_app(
     setup_fastapi(fast_app)
     fast_app.include_router(auth_ui)
     fast_app.include_router(dashboard_ui)
+    fast_app.include_router(chat_ui)
     fast_app.include_router(auth_api)
     fast_app.include_router(users_api)
     fast_app.include_router(upload_api)
