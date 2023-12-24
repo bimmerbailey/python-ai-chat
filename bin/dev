@@ -26,6 +26,7 @@ setup_llama_cpp() {
 local_server() {
   export S3_URI=http://localhost:9000
   export MONGO_URL=mongodb://localhost:27017/rag_app
+  export REDIS_HOST=localhost
   export REDIS_DSN=redis://localhost:6379
   export MILVUS_URI=http://localhost
   export MILVUS_HOSTNAME=localhost

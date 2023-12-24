@@ -26,6 +26,8 @@ from app.dependencies.components import (
     get_llm_component,
     get_node_store_component,
     get_vector_store_component,
+    get_ingestion_component,
+    get_embeddings_settings,
 )
 from app.paths import local_data_path
 
@@ -92,6 +94,12 @@ class IngestService(metaclass=SingletonMetaClass):
             embed_model=embedding_component.embedding_model,
             node_parser=node_parser,
             transformations=[node_parser, embedding_component.embedding_model],
+        )
+
+        self.ingest_component = get_ingestion_component(
+            self.storage_context,
+            self.ingest_service_context,
+            settings=get_embeddings_settings(),
         )
 
     def ingest(self, file_name: str, file_data: AnyStr | Path) -> list[IngestedDoc]:
