@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps({
-  text: String,
+  text: { type: String, required: false },
   author: String,
 })
 </script>
