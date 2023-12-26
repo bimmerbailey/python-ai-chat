@@ -2,8 +2,13 @@ export interface OpenAIDelta {
   content: string | null
 }
 
+export enum MessageRole {
+  user = 'user',
+  assistant = 'assistant',
+}
+
 export interface OpenAIMessage {
-  role: string // TODO: Come back to this "Literal", Enum?
+  role: MessageRole
   content: string
 }
 
@@ -29,4 +34,11 @@ export interface ChatBody {
   context_filter: null | undefined
   include_sources: boolean
   stream: boolean
+}
+
+export interface ChatResponse {
+  message: OpenAIMessage
+  raw: object | null
+  delta: string | null
+  additional_kwargs: object
 }

@@ -3,6 +3,7 @@ import type {
   OpenAICompletion,
   OpenAIMessage,
 } from '@/interfaces/Chat'
+import { MessageRole } from '@/interfaces/Chat'
 import type { AxiosError } from 'axios'
 
 import { defineStore } from 'pinia'
@@ -14,7 +15,6 @@ interface ChatStore {
   chatHistory: OpenAIMessage[]
   useContext: boolean
   contextFilter: null | undefined
-  includeSources: boolean
   stream: boolean
 }
 
@@ -26,7 +26,6 @@ export const useChatStore = defineStore('chat', {
     loading: false,
     useContext: false,
     stream: false,
-    includeSources: false,
     contextFilter: null,
   }),
   actions: {
@@ -36,7 +35,7 @@ export const useChatStore = defineStore('chat', {
       if (this.newMessage != undefined) {
         const formattedNewMessage: OpenAIMessage = {
           content: this.newMessage,
-          role: 'user',
+          role: MessageRole.user,
         }
         this.chatHistory.push(formattedNewMessage)
       }
@@ -44,9 +43,10 @@ export const useChatStore = defineStore('chat', {
         messages: this.chatHistory,
         use_context: this.useContext,
         stream: this.stream,
-        include_sources: this.includeSources,
+        include_sources: this.useContext,
         context_filter: this.contextFilter,
       }
+      console.log("Body", body)
       return await ChatApi.chatQuery(body)
         .then((res: OpenAICompletion): void => {
           res.choices.forEach((choice) => {
