@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type PropType } from 'vue'
 import FormCheckRadio from '@/components/FormCheckRadio.vue'
+import type { ItemType } from '@/interfaces/Components'
 
 const props = defineProps({
   options: {
-    type: Object,
-    default: () => {},
+    type: Array as PropType<ItemType[]>,
   },
   name: {
     type: String,
@@ -44,13 +44,13 @@ const computedValue = computed({
     :class="{ 'flex-col': isColumn }"
   >
     <FormCheckRadio
-      v-for="(value, key) in options"
-      :key="key"
+      v-for="option in options"
+      :key="option.text"
       v-model="computedValue"
       :type="type"
       :name="name"
-      :input-value="key"
-      :label="value"
+      :input-value="option.value"
+      :label="option.text"
       :class="componentClass"
       class="mr-6 mb-3 last:mr-0"
     />
