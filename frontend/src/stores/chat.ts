@@ -46,7 +46,6 @@ export const useChatStore = defineStore('chat', {
         include_sources: this.useContext,
         context_filter: this.contextFilter,
       }
-      console.log("Body", body)
       return await ChatApi.chatQuery(body)
         .then((res: OpenAICompletion): void => {
           res.choices.forEach((choice) => {
@@ -58,6 +57,7 @@ export const useChatStore = defineStore('chat', {
         })
         .finally(() => {
           this.loading = false
+          this.newMessage = ""
         })
     },
   },
