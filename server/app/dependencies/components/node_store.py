@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Annotated
 
 import structlog.stdlib
 from llama_index.storage.docstore import (
@@ -8,18 +9,21 @@ from llama_index.storage.docstore import (
 )
 from llama_index.storage.index_store import RedisIndexStore, SimpleIndexStore
 from llama_index.storage.index_store.types import BaseIndexStore
+from fastapi import Depends
 
 from app.config.settings import RedisSettings, get_redis_settings
-from app.paths import local_data_path
+from app.dependencies.base import SingletonMetaClass
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class NodeStoreComponent:
+class NodeStoreComponent(metaclass=SingletonMetaClass):
     index_store: BaseIndexStore
     doc_store: BaseDocumentStore
 
-    def __init__(self, settings: RedisSettings = get_redis_settings()) -> None:
+    def __init__(
+        self, settings: Annotated[RedisSettings, Depends()] = get_redis_settings()
+    ) -> None:
         try:
             # self.index_store = SimpleIndexStore.from_persist_dir(
             #     persist_dir=str(local_data_path)

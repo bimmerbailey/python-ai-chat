@@ -13,6 +13,37 @@ from app.routes.chat import chat_router
 from app.routes.ingest import router as ingest_router
 from app.routes.upload import router as upload_router
 from app.routes.users import router as users_router
+from app.dependencies.components import (
+    LLMComponent,
+    NodeStoreComponent,
+    VectorStoreComponent,
+    EmbeddingComponent,
+)
+
+from app.dependencies.services import (
+    ChatService,
+    ChunksService,
+    EmbeddingsService,
+    IngestService,
+)
+
+
+async def init_deps():
+    embeddings = EmbeddingComponent()
+    llms = LLMComponent()
+    nodes = NodeStoreComponent()
+    vectors = VectorStoreComponent()
+
+    ChatService(
+        llm_component=llms,
+        vector_store_component=vectors,
+        embedding_component=embeddings,
+        node_store_component=nodes,
+    )
+    ChunksService()
+    EmbeddingsService()
+    IngestService()
+    pass
 
 
 @asynccontextmanager

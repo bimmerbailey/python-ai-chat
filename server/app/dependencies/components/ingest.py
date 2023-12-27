@@ -228,7 +228,7 @@ class BatchIngestComponent(BaseIngestComponentWithIndex):
         logger.info("Ingesting file_name=%s", file_name)
         documents = IngestionHelper.transform_file_into_documents(file_name, file_data)
         logger.info(
-            "Transformed file=%s into count=%s documents", file_name, len(documents)
+            "Transformed file into documents", file_name=file_name, count=len(documents)
         )
         logger.debug("Saving the documents in the index and doc store")
         return self._save_docs(documents)
