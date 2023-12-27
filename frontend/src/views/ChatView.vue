@@ -4,6 +4,7 @@ import SectionMain from '@/components/SectionMain.vue'
 
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import ChatBox from '@/components/ChatBox.vue'
+import DocumentList from '@/components/DocumentList.vue'
 
 import { mdiRobotOutline } from '@mdi/js'
 </script>
@@ -16,8 +17,9 @@ import { mdiRobotOutline } from '@mdi/js'
         title="Chat with AI"
         main
       />
-      <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
-        <chat-box />
+      <div class="grid rid-cols-3 md:grid-cols-12 gap-4">
+        <document-list class="md:col-span-3 sm:col-span-3 overflow-auto" />
+        <chat-box class="md:col-span-9 sm:col-span-3" />
       </div>
     </section-main>
   </layout-authenticated>
