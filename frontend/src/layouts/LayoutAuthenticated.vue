@@ -18,7 +18,7 @@ useMainStore().setUser({
   name: 'John Doe',
   email: 'john@example.com',
   avatar:
-    'https://avatars.dicebear.com/api/avataaars/example.svg?options[top][]=shortHair&options[accessoriesChance]=93',
+    'https://api.dicebear.com/7.x/avataaars-neutral/svg',
 })
 
 const layoutAsidePadding = 'xl:pl-60'
@@ -85,14 +85,14 @@ const menuClick = (event: Event, item: ItemI) => {
         >
           <BaseIcon :path="mdiMenu" size="24" />
         </NavBarItemPlain>
-        <NavBarItemPlain use-margin>
-          <FormControl
-            placeholder="Search (ctrl+k)"
-            ctrl-k-focus
-            transparent
-            borderless
-          />
-        </NavBarItemPlain>
+<!--        <NavBarItemPlain use-margin>-->
+<!--          <FormControl-->
+<!--            placeholder="Search (ctrl+k)"-->
+<!--            ctrl-k-focus-->
+<!--            transparent-->
+<!--            borderless-->
+<!--          />-->
+<!--        </NavBarItemPlain>-->
       </NavBar>
       <AsideMenu
         :is-aside-mobile-expanded="isAsideMobileExpanded"
