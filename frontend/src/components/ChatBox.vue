@@ -6,6 +6,7 @@ import ChatMessages from '@/components/ChatMessages.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
 import { useChatStore } from '@/stores/chat'
 import { storeToRefs } from 'pinia'
+import CardBox from '@/components/CardBox.vue'
 
 const chatStore = useChatStore()
 
@@ -25,7 +26,7 @@ const clearMessages = () => {
 </script>
 
 <template>
-  <div>
+  <card-box>
     <form-check-radio-group
       name="chat-type"
       :options="[
@@ -35,7 +36,7 @@ const clearMessages = () => {
       v-model="useContext"
       type="radio"
     />
-    <div class="bg-gray-500 rounded p-2">
+    <div class="bg-gray-500 rounded p-2 size-40">
       <div v-for="message in chatHistory">
         <chat-messages :text="message.content" :author="message.role" />
       </div>
@@ -59,7 +60,7 @@ const clearMessages = () => {
         </div>
       </form-field>
     </div>
-  </div>
+  </card-box>
 </template>
 
 <style scoped></style>

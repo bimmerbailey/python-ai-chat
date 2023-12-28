@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { IngestApi } from '@/api/ingest'
 import { onMounted, type Ref, ref } from 'vue'
+
+import { IngestApi } from '@/api/ingest'
+import CardBox from '@/components/CardBox.vue'
 
 const documents: Ref<string[]> = ref([])
 
@@ -19,11 +21,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <card-box>
+    <h1 class="text-2xl font-bold pb-2">Uploaded Documents</h1>
     <ul v-for="document in documents">
       {{ document }}
     </ul>
-  </div>
+  </card-box>
 </template>
 
 <style scoped></style>

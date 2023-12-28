@@ -17,7 +17,7 @@ import { mdiRobotOutline } from '@mdi/js'
         title="Chat with AI"
         main
       />
-      <div class="grid rid-cols-3 md:grid-cols-12 gap-4">
+      <div class="grid sm:grid-cols-3 md:grid-cols-12 gap-4 min-h-screen">
         <document-list class="md:col-span-3 sm:col-span-3 overflow-auto" />
         <chat-box class="md:col-span-9 sm:col-span-3" />
       </div>
