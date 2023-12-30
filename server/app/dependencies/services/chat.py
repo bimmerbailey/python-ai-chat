@@ -71,7 +71,7 @@ class ChatEngineInput:
         )
 
 
-class ChatService(metaclass=SingletonMetaClass):
+class ChatService:
     def __init__(
         self,
         llm_component: LLMComponent = get_llm_component(),
@@ -189,3 +189,8 @@ class ChatService(metaclass=SingletonMetaClass):
         sources = [Chunk.from_node(node) for node in wrapped_response.source_nodes]
         completion = Completion(response=wrapped_response.response, sources=sources)
         return completion
+
+
+@lru_cache
+def get_chat_service() -> ChatService:
+    return ChatService()

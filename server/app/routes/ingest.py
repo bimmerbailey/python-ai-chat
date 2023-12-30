@@ -20,7 +20,8 @@ class IngestResponse(BaseModel):
 
 @router.post("/ingest", tags=["Ingestion"])
 def ingest(
-    service: Annotated[IngestService, Depends()], file: UploadFile
+    file: UploadFile,
+    service: IngestService = Depends(get_ingest_service),
 ) -> IngestResponse:
     """Ingests and processes a file, storing its chunks to be used as context.
 
@@ -44,7 +45,9 @@ def ingest(
 
 
 @router.get("/ingest/list", tags=["Ingestion"])
-def list_ingested(service: Annotated[IngestService, Depends()]) -> IngestResponse:
+def list_ingested(
+    service: IngestService = Depends(get_ingest_service),
+) -> IngestResponse:
     """Lists already ingested Documents including their Document ID and metadata.
 
     Those IDs can be used to filter the context used to create responses
@@ -55,7 +58,10 @@ def list_ingested(service: Annotated[IngestService, Depends()]) -> IngestRespons
 
 
 @router.delete("/ingest/{doc_id}", tags=["Ingestion"])
-def delete_ingested(service: Annotated[IngestService, Depends()], doc_id: str) -> None:
+def delete_ingested(
+    doc_id: str,
+    service: IngestService = Depends(get_ingest_service),
+) -> None:
     """Delete the specified ingested Document.
 
     The `doc_id` can be obtained from the `GET /ingest/list` endpoint.

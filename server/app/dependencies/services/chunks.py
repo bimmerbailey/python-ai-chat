@@ -4,7 +4,7 @@ from llama_index import ServiceContext, StorageContext, VectorStoreIndex
 from llama_index.schema import NodeWithScore
 from pydantic import BaseModel, Field
 
-from app.dependencies.base import ContextFilter, SingletonMetaClass
+from app.dependencies.base import ContextFilter
 from app.dependencies.components import (
     EmbeddingComponent,
     LLMComponent,
@@ -55,7 +55,7 @@ class Chunk(BaseModel):
         )
 
 
-class ChunksService(metaclass=SingletonMetaClass):
+class ChunksService:
     def __init__(
         self,
         llm_component: LLMComponent = get_llm_component(),

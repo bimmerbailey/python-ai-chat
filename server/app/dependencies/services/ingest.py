@@ -1,4 +1,5 @@
 import tempfile
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, AnyStr, Literal
 
@@ -16,7 +17,6 @@ from llama_index.readers import JSONReader, StringIterableReader
 from llama_index.readers.file.base import DEFAULT_FILE_READER_CLS
 from pydantic import BaseModel, Field
 
-from app.dependencies.base import SingletonMetaClass
 from app.dependencies.components import (
     EmbeddingComponent,
     LLMComponent,
@@ -66,20 +66,18 @@ class IngestedDoc(BaseModel):
         return metadata
 
 
-class IngestService(metaclass=SingletonMetaClass):
+class IngestService:
     def __init__(
         self,
-        llm_component: Annotated[
-            LLMComponent, Depends(get_llm_component)
-        ] = get_llm_component(),
+        llm_component: Annotated[LLMComponent, Depends()] = get_llm_component(),
         vector_store_component: Annotated[
-            VectorStoreComponent, Depends(get_vector_store_component)
+            VectorStoreComponent, Depends()
         ] = get_vector_store_component(),
         embedding_component: Annotated[
-            EmbeddingComponent, Depends(get_embeddings_component)
+            EmbeddingComponent, Depends()
         ] = get_embeddings_component(),
         node_store_component: Annotated[
-            NodeStoreComponent, Depends(get_node_store_component)
+            NodeStoreComponent, Depends()
         ] = get_node_store_component(),
     ) -> None:
         node_parser = SentenceWindowNodeParser.from_defaults()
@@ -188,7 +186,6 @@ class IngestService(metaclass=SingletonMetaClass):
         try:
             docstore = self.storage_context.docstore
             ingested_docs_ids: set[str] = set()
-            logger.debug("Hit", store=self.storage_context.docstore)
 
             for node in docstore.docs.values():
                 if node.ref_doc_id is not None:
@@ -229,3 +226,8 @@ class IngestService(metaclass=SingletonMetaClass):
 
         # Save the index
         self.storage_context.persist(persist_dir=local_data_path)
+
+
+@lru_cache
+def get_ingest_service() -> IngestService:
+    return IngestService()

@@ -13,7 +13,7 @@ from app.dependencies.open_ai.openai_models import (
     to_openai_response,
     to_openai_sse_stream,
 )
-from app.dependencies.services.chat import ChatService
+from app.dependencies.services.chat import ChatService, get_chat_service
 
 chat_router = APIRouter(prefix="/api/v1")
 logger = structlog.stdlib.get_logger(__name__)
@@ -52,7 +52,9 @@ class ChatBody(BaseModel):
     tags=["Contextual Completions"],
 )
 def chat_completion(
-    request: Request, body: ChatBody, service: Annotated[ChatService, Depends()]
+    request: Request,
+    body: ChatBody,
+    service: ChatService = Depends(get_chat_service),
 ) -> OpenAICompletion | StreamingResponse:
     """Given a list of messages comprising a conversation, return a response.
 
