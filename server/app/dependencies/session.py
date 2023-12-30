@@ -1,14 +1,14 @@
 import structlog
-from fastapi import HTTPException, Request, status, Depends
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
-from redis.asyncio import Redis
 from pydantic import RedisDsn
+from redis.asyncio import Redis
 
 from app.config.settings import (
-    app_settings,
-    redis_settings,
     RedisSettings,
+    app_settings,
     get_redis_settings,
+    redis_settings,
 )
 
 logger = structlog.get_logger(__name__)

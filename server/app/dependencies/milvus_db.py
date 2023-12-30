@@ -38,7 +38,6 @@ def close_milvus_client(client: MilvusClient):
 
 
 class MilvusStoreComponent(MilvusVectorStore):
-
     def __init__(
         self,
         uri: str = str(milvus_settings.uri),

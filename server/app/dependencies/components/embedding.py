@@ -10,9 +10,7 @@ from app.paths import models_cache_path
 class EmbeddingComponent:
     embedding_model: BaseEmbedding
 
-    def __init__(
-        self, app_settings: AppSettings = get_app_settings()
-    ) -> None:
+    def __init__(self, app_settings: AppSettings = get_app_settings()) -> None:
         if app_settings.fastapi_env != "testing":
             from llama_index.embeddings import HuggingFaceEmbedding
 

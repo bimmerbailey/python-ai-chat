@@ -18,10 +18,7 @@ class NodeStoreComponent:
     index_store: BaseIndexStore
     doc_store: BaseDocumentStore
 
-    def __init__(
-        self,
-        settings: RedisSettings = get_redis_settings()
-    ) -> None:
+    def __init__(self, settings: RedisSettings = get_redis_settings()) -> None:
         try:
             self.index_store = RedisIndexStore.from_host_and_port(
                 host=settings.host, port=settings.port

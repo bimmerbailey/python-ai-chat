@@ -23,7 +23,6 @@ from app.dependencies.components import (
 )
 from app.dependencies.services.chunks import Chunk
 
-
 logger = structlog.stdlib.get_logger(__name__)
 
 
