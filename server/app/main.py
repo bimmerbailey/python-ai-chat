@@ -1,32 +1,33 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
 
+import structlog.stdlib
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.logging import setup_fastapi, setup_logging
 from app.config.settings import AppSettings, get_app_settings
 from app.database.init_db import close_mongo_connection, connect_to_mongo
-from app.dependencies.session import close_redis_client, init_redis_client
-from app.routes.auth import router as auth_router
-from app.routes.chat import chat_router
-from app.routes.ingest import router as ingest_router
-from app.routes.upload import router as upload_router
-from app.routes.users import router as users_router
 from app.dependencies.components import (
+    EmbeddingComponent,
     LLMComponent,
     NodeStoreComponent,
     VectorStoreComponent,
-    EmbeddingComponent,
 )
-
 from app.dependencies.services import (
     ChatService,
     ChunksService,
     EmbeddingsService,
     IngestService,
 )
+from app.dependencies.session import close_redis_client, init_redis_client
+from app.routes.auth import router as auth_router
+from app.routes.chat import chat_router
+from app.routes.ingest import router as ingest_router
+from app.routes.upload import router as upload_router
+from app.routes.users import router as users_router
 
+logger = structlog.stdlib.get_logger(__name__)
 
 async def init_deps():
     embeddings = EmbeddingComponent()

@@ -2,6 +2,7 @@ from functools import lru_cache
 from typing import Annotated
 
 import structlog.stdlib
+from fastapi import Depends
 from llama_index.storage.docstore import (
     BaseDocumentStore,
     RedisDocumentStore,
@@ -9,7 +10,6 @@ from llama_index.storage.docstore import (
 )
 from llama_index.storage.index_store import RedisIndexStore, SimpleIndexStore
 from llama_index.storage.index_store.types import BaseIndexStore
-from fastapi import Depends
 
 from app.config.settings import RedisSettings, get_redis_settings
 from app.dependencies.base import SingletonMetaClass

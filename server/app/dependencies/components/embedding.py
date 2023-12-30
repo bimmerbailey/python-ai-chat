@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import Depends
 from llama_index import MockEmbedding

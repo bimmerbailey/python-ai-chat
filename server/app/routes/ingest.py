@@ -3,7 +3,11 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from app.dependencies.services.ingest import IngestedDoc, IngestService
+from app.dependencies.services.ingest import (
+    IngestedDoc,
+    IngestService,
+    get_ingest_service,
+)
 
 router = APIRouter(prefix="/api/v1")
 

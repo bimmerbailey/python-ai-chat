@@ -23,11 +23,11 @@ from app.dependencies.components import (
     NodeStoreComponent,
     VectorStoreComponent,
     get_embeddings_component,
+    get_embeddings_settings,
+    get_ingestion_component,
     get_llm_component,
     get_node_store_component,
     get_vector_store_component,
-    get_ingestion_component,
-    get_embeddings_settings,
 )
 from app.paths import local_data_path
 

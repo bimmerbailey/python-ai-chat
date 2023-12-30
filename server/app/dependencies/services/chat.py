@@ -1,17 +1,16 @@
 from dataclasses import dataclass
+from functools import lru_cache
 
 import structlog.stdlib
-from fastapi import Depends
 from llama_index import ServiceContext, StorageContext, VectorStoreIndex
 from llama_index.chat_engine import ContextChatEngine, SimpleChatEngine
 from llama_index.chat_engine.types import BaseChatEngine
 from llama_index.indices.postprocessor import MetadataReplacementPostProcessor
-from llama_index.llm_predictor.utils import stream_chat_response_to_tokens
 from llama_index.llms import ChatMessage, MessageRole
 from llama_index.types import TokenGen
 from pydantic import BaseModel
 
-from app.dependencies.base import ContextFilter, SingletonMetaClass
+from app.dependencies.base import ContextFilter
 from app.dependencies.components import (
     EmbeddingComponent,
     LLMComponent,

@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Literal
 
 from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
-from pydantic import AnyHttpUrl, MongoDsn, RedisDsn, Field
+from pydantic import AnyHttpUrl, Field, MongoDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

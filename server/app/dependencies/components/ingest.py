@@ -22,8 +22,8 @@ from llama_index.ingestion import run_transformations
 from llama_index.readers import JSONReader, StringIterableReader
 from llama_index.readers.file.base import DEFAULT_FILE_READER_CLS
 
-from app.paths import local_data_path
 from app.config.settings import EmbeddingSettings, get_embeddings_settings
+from app.paths import local_data_path
 
 logger = structlog.stdlib.get_logger(__name__)
 
