@@ -54,7 +54,7 @@ class ChatBody(BaseModel):
 def chat_completion(
     request: Request,
     body: ChatBody,
-    service: ChatService = Depends(get_chat_service),
+    service: Annotated[ChatService, Depends(get_chat_service)],
 ) -> OpenAICompletion | StreamingResponse:
     """Given a list of messages comprising a conversation, return a response.
 
