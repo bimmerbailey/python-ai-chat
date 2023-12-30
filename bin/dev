@@ -14,12 +14,12 @@ setup_llama_cpp() {
   if [ "$arch" == 'x86_64'  ]
     then
       echo "This is 64 bit"
-      CMAKE_ARGS="-DLLAMA_CUBLAS=on" poetry run pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
+      CMAKE_ARGS="-DLLAMA_CUBLAS=on" poetry -C server run pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
   
   elif [ "$arch" == 'arm64' ]
    then
       echo "This is Mac arm64"
-      CMAKE_ARGS="-DLLAMA_METAL=on" poetry run pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
+      CMAKE_ARGS="-DLLAMA_METAL=on" poetry -C server run pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
   fi
 }
 
@@ -31,8 +31,8 @@ local_server() {
   export MILVUS_URI=http://localhost
   export MILVUS_HOSTNAME=localhost
   docker compose up milvus-db mongo redis -d
-  cd server
-  poetry run uvicorn app.main:init_app --host 0.0.0.0 \
+
+  poetry -C server run uvicorn app.main:init_app --host 0.0.0.0 \
      --port 8000 --reload --factory --no-access-log 
 }
 
