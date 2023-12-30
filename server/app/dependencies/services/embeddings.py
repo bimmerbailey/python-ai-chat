@@ -1,8 +1,8 @@
+from functools import lru_cache
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.dependencies.base import SingletonMetaClass
 from app.dependencies.components.embedding import EmbeddingComponent
 
 
@@ -12,7 +12,7 @@ class Embedding(BaseModel):
     embedding: list[float] = Field(examples=[[0.0023064255, -0.009327292]])
 
 
-class EmbeddingsService(metaclass=SingletonMetaClass):
+class EmbeddingsService:
     def __init__(self, embedding_component: EmbeddingComponent) -> None:
         self.embedding_model = embedding_component.embedding_model
 
@@ -26,3 +26,8 @@ class EmbeddingsService(metaclass=SingletonMetaClass):
             )
             for embedding in texts_embeddings
         ]
+
+
+@lru_cache
+def get_embedding_service() -> EmbeddingsService:
+    return EmbeddingsService()

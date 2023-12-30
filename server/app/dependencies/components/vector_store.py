@@ -7,21 +7,20 @@ from llama_index import VectorStoreIndex
 from llama_index.indices.vector_store import VectorIndexRetriever
 from llama_index.vector_stores.milvus import MilvusVectorStore
 from llama_index.vector_stores.types import VectorStore
+from pydantic import BaseModel
 
 from app.config.settings import MilvusSettings, get_milvus_settings
-from app.dependencies.base import ContextFilter, SingletonMetaClass
+from app.dependencies.base import ContextFilter
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class VectorStoreComponent(metaclass=SingletonMetaClass):
+class VectorStoreComponent:
     vector_store: VectorStore
 
     def __init__(
         self,
-        milvus_settings: typing.Annotated[
-            MilvusSettings, Depends()
-        ] = get_milvus_settings(),
+        milvus_settings: MilvusSettings = get_milvus_settings(),
     ) -> None:
         self.vector_store = typing.cast(
             VectorStore,

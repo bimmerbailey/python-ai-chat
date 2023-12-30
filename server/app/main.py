@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import structlog.stdlib
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,6 +23,8 @@ from app.routes import (
 )
 from app.middleware.session import SessionMiddleware
 
+logger = structlog.stdlib.get_logger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,11 +35,8 @@ async def lifespan(app: FastAPI):
     await close_redis_client(redis_client)
 
 
-def init_app(
-    app_settings: AppSettings = get_app_settings(),
-):
+def init_app(app_settings: AppSettings = get_app_settings()):
     setup_logging(json_logs=app_settings.json_logs, log_level=app_settings.log_level)
-
     fast_app = FastAPI(
         docs_url="/api/docs",
         redoc_url="/api/redoc",

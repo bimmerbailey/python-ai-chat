@@ -7,8 +7,8 @@ from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from app.config.settings import mongo_settings
-from app.models.users import Users
 from app.dependencies.crypt import hash_password
+from app.models.users import Users
 
 logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
 

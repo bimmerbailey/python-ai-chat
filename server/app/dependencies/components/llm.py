@@ -5,20 +5,18 @@ from fastapi import Depends
 from llama_index.llms import MockLLM
 from llama_index.llms.base import LLM
 from llama_index.llms.llama_utils import completion_to_prompt, messages_to_prompt
+from pydantic import BaseModel
 
 from app.config.settings import AppSettings, get_app_settings
-from app.dependencies.base import SingletonMetaClass
 from app.paths import models_path
 
 
-class LLMComponent(metaclass=SingletonMetaClass):
+class LLMComponent:
     llm: LLM
 
     def __init__(
         self,
-        app_settings: Annotated[
-            AppSettings, Depends(get_app_settings)
-        ] = get_app_settings(),
+        app_settings: AppSettings = get_app_settings(),
     ) -> None:
         from llama_index.llms import LlamaCPP
 
