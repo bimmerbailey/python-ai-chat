@@ -31,9 +31,9 @@ class CookieAuth(OAuth2PasswordBearer):
         return authorization
 
 
-async def init_redis_client() -> Redis:
-    logger.info("Connecting to Redis...", db=redis_settings.dsn)
-    client = Redis.from_url(str(redis_settings.dsn))
+def init_redis_client(url: RedisDsn = redis_settings.dsn) -> Redis:
+    logger.info("Connecting to Redis...", db=url)
+    client = Redis.from_url(str(url))
     logger.info("Connected to Redis!")
     return client
 
@@ -42,3 +42,20 @@ async def close_redis_client(client: Redis):
     logger.info("Closing connection to Redis...")
     await client.close()
     logger.info("Connection closed!")
+
+
+class RedisClient:
+    _client: Redis
+
+    def __init__(self, settings: RedisSettings = Depends(get_redis_settings)):
+        self._client = init_redis_client(url=settings.redis_url)
+
+    async def close(self):
+        await close_redis_client(self._client)
+
+    def __call__(self) -> Redis:
+        return self.client
+
+    @property
+    def client(self):
+        return self._client
