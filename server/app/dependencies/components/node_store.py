@@ -10,7 +10,6 @@ from llama_index.storage.index_store import RedisIndexStore, SimpleIndexStore
 from llama_index.storage.index_store.types import BaseIndexStore
 
 from app.config.settings import RedisSettings, get_redis_settings
-from app.paths import local_data_path
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -21,9 +20,6 @@ class NodeStoreComponent:
 
     def __init__(self, settings: RedisSettings = get_redis_settings()) -> None:
         try:
-            # self.index_store = SimpleIndexStore.from_persist_dir(
-            #     persist_dir=str(local_data_path)
-            # )
             self.index_store = RedisIndexStore.from_host_and_port(
                 host=settings.host, port=settings.port
             )
@@ -32,9 +28,6 @@ class NodeStoreComponent:
             self.index_store = SimpleIndexStore()
 
         try:
-            # self.doc_store = SimpleDocumentStore.from_persist_dir(
-            #     persist_dir=str(local_data_path)
-            # )
             self.doc_store = RedisDocumentStore.from_host_and_port(
                 host=settings.host, port=settings.port
             )

@@ -1,14 +1,14 @@
 from functools import lru_cache
+from typing import Literal
 
 from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
-from pydantic import AnyHttpUrl, MongoDsn, RedisDsn
+from pydantic import AnyHttpUrl, Field, MongoDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class MongoSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="mongo_")
     hostname: str = "mongo"
-    # hostname: str = "localhost"
     port: int = 27017
     password: str = "password"
     name: str = "rag_app"
@@ -41,7 +41,6 @@ class AppSettings(BaseSettings):
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="redis_")
 
-    # host: str = "localhost"
     host: str = "redis"
     port: int = 6379
     dsn: RedisDsn = f"redis://{host}:{port}"
@@ -51,7 +50,6 @@ class MilvusSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="milvus_")
 
     uri: AnyHttpUrl = "http://milvus-db"
-    # uri: AnyHttpUrl = f"http://localhost"
     hostname: str = str(uri).split("/")[-1]
     collection_name: str = "ragCollection"
     token: str = ""
@@ -68,10 +66,37 @@ class S3Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="s3_")
 
     uri: AnyHttpUrl = "http://minio:9000"
-    # uri: AnyHttpUrl = "http://localhost:9000"
     bucket: str = "a-bucket"
     aws_access_key_id: str = "minioadmin"
     aws_secret_access_key: str = "minioadmin"
+
+
+class EmbeddingSettings(BaseSettings):
+    mode: Literal["local", "openai", "sagemaker", "mock"]
+    ingest_mode: Literal["simple", "batch", "parallel"] = Field(
+        "simple",
+        description=(
+            "The ingest mode to use for the embedding engine:\n"
+            "If `simple` - ingest files sequentially and one by one. It is the historic behaviour.\n"
+            "If `batch` - if multiple files, parse all the files in parallel, "
+            "and send them in batch to the embedding model.\n"
+            "If `parallel` - parse the files in parallel using multiple cores, and embedd them in parallel.\n"
+            "`parallel` is the fastest mode for local setup, as it parallelize IO RW in the index.\n"
+            "For modes that leverage parallelization, you can specify the number of "
+            "workers to use with `count_workers`.\n"
+        ),
+    )
+    count_workers: int = Field(
+        2,
+        description=(
+            "The number of workers to use for file ingestion.\n"
+            "In `batch` mode, this is the number of workers used to parse the files.\n"
+            "In `parallel` mode, this is the number of workers used to parse the files and embed them.\n"
+            "This is only used if `ingest_mode` is not `simple`.\n"
+            "Do not go too high with this number, as it might cause memory issues. (especially in `parallel` mode)\n"
+            "Do not set it higher than your number of threads of your CPU."
+        ),
+    )
 
 
 mongo_settings = MongoSettings()
@@ -100,3 +125,8 @@ def get_s3_settings() -> S3Settings:
 @lru_cache
 def get_redis_settings() -> RedisSettings:
     return RedisSettings()
+
+
+@lru_cache
+def get_embeddings_settings() -> EmbeddingSettings:
+    return EmbeddingSettings(mode="local")

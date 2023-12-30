@@ -4,13 +4,15 @@ from llama_index import ServiceContext, StorageContext, VectorStoreIndex
 from llama_index.schema import NodeWithScore
 from pydantic import BaseModel, Field
 
-from app.dependencies.base import ContextFilter, SingletonMetaClass
+from app.dependencies.base import ContextFilter
 from app.dependencies.components import (
     EmbeddingComponent,
     LLMComponent,
+    NodeStoreComponent,
     VectorStoreComponent,
     get_embeddings_component,
     get_llm_component,
+    get_node_store_component,
     get_vector_store_component,
 )
 from app.dependencies.services.ingest import IngestedDoc
@@ -53,16 +55,19 @@ class Chunk(BaseModel):
         )
 
 
-class ChunksService(metaclass=SingletonMetaClass):
+class ChunksService:
     def __init__(
         self,
         llm_component: LLMComponent = get_llm_component(),
         vector_store_component: VectorStoreComponent = get_vector_store_component(),
         embedding_component: EmbeddingComponent = get_embeddings_component(),
+        node_store_component: NodeStoreComponent = get_node_store_component(),
     ) -> None:
         self.vector_store_component = vector_store_component
         self.storage_context = StorageContext.from_defaults(
             vector_store=vector_store_component.vector_store,
+            docstore=node_store_component.doc_store,
+            index_store=node_store_component.index_store,
         )
         self.query_service_context = ServiceContext.from_defaults(
             llm=llm_component.llm, embed_model=embedding_component.embedding_model

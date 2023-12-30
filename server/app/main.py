@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
-from typing import Annotated
 
-from fastapi import Depends, FastAPI
+import structlog.stdlib
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.logging import setup_fastapi, setup_logging
@@ -13,6 +13,8 @@ from app.routes.chat import chat_router
 from app.routes.ingest import router as ingest_router
 from app.routes.upload import router as upload_router
 from app.routes.users import router as users_router
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @asynccontextmanager
@@ -26,7 +28,6 @@ async def lifespan(app: FastAPI):
 
 def init_app(app_settings: AppSettings = get_app_settings()):
     setup_logging(json_logs=app_settings.json_logs, log_level=app_settings.log_level)
-
     fast_app = FastAPI(
         docs_url="/api/docs",
         redoc_url="/api/redoc",

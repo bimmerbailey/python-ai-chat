@@ -3,31 +3,42 @@ import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/base-components/BaseButton.vue'
 import ChatMessages from '@/components/ChatMessages.vue'
-import { ref } from 'vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import { useChatStore } from '@/stores/chat'
+import { storeToRefs } from 'pinia'
+import CardBox from '@/components/CardBox.vue'
+
+const chatStore = useChatStore()
 
 const sendMessage = () => {
-  console.log('Message', newMessage.value)
-  if (newMessage.value != null) {
-    chatMessages.value?.push(newMessage.value)
-  }
-  console.log('All messages', chatMessages.value)
+  chatStore.sendMessage().catch((err) => {
+    console.log(err)
+  })
 }
+
+const { chatHistory, newMessage, useContext } = storeToRefs(chatStore)
 
 const clearMessages = () => {
-  if (chatMessages.value.length > 0) {
-    chatMessages.value = []
+  if (chatStore.chatHistory.length > 0) {
+    chatStore.chatHistory = []
   }
 }
-
-const chatMessages = ref<Array<string>>([])
-const newMessage = ref<string>()
 </script>
 
 <template>
-  <div>
-    <div class="bg-gray-500 rounded p-2">
-      <div v-for="message in chatMessages">
-        <chat-messages :text="message" author="me" />
+  <card-box>
+    <form-check-radio-group
+      name="chat-type"
+      :options="[
+        { text: 'LLM Chat', value: false },
+        { text: 'Chat with docs', value: true },
+      ]"
+      v-model="useContext"
+      type="radio"
+    />
+    <div class="bg-gray-500 rounded p-2 size-40">
+      <div v-for="message in chatHistory">
+        <chat-messages :text="message.content" :author="message.role" />
       </div>
     </div>
     <div>
@@ -49,7 +60,7 @@ const newMessage = ref<string>()
         </div>
       </form-field>
     </div>
-  </div>
+  </card-box>
 </template>
 
 <style scoped></style>
