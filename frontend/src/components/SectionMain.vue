@@ -1,9 +1,0 @@
-<script setup lang="ts">
-import { containerMaxW } from '@/styles/config'
-</script>
-
-<template>
-  <section class="p-6" :class="`${containerMaxW} flex flex-col min-h-screen`">
-    <slot />
-  </section>
-</template>
