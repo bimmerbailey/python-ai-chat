@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
+import pathlib
 
 import structlog.stdlib
 from fastapi import FastAPI
+from fastapi.routing import Mount
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config.logging import setup_fastapi, setup_logging
 from app.config.settings import (
@@ -10,7 +13,7 @@ from app.config.settings import (
     get_app_settings,
 )
 from app.database.init_db import close_mongo_connection, connect_to_mongo
-from app.dependencies.session import close_redis_client, init_redis_client
+from app.dependencies.session import RedisClient
 from app.routes import (
     auth_ui,
     dashboard_ui,
@@ -29,19 +32,33 @@ logger = structlog.stdlib.get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db_client = await connect_to_mongo()
-    redis_client = init_redis_client()
+    red = RedisClient()
     yield
     await close_mongo_connection(db_client)
-    await close_redis_client(redis_client)
+    await red.close()
+
+
+current_dir = pathlib.Path(__file__).parent
+static_dir = current_dir / "static"
 
 
 def init_app(app_settings: AppSettings = get_app_settings()):
-    setup_logging(json_logs=app_settings.json_logs, log_level=app_settings.log_level)
+    setup_logging(
+        json_logs=app_settings.json_logs, 
+        log_level=app_settings.log_level
+    )
     fast_app = FastAPI(
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
         lifespan=lifespan,
+        routes=[
+            Mount(
+                "/static",
+                StaticFiles(directory=static_dir),
+                name="static",
+            )
+        ],
     )
 
     origins = ["*"]

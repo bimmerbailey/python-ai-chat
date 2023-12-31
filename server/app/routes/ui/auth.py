@@ -5,7 +5,7 @@ import structlog
 from app.routes.ui.template import templates
 
 router = APIRouter(tags=["Authentication"])
-logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @router.get("/login", response_class=HTMLResponse)

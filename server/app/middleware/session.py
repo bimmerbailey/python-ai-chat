@@ -10,7 +10,7 @@ from starlette.requests import HTTPConnection
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from redis.asyncio import Redis
 
-from app.dependencies.session import init_redis_client
+from app.dependencies.session import init_redis_client, RedisClient
 from app.config.settings import jwt_settings
 
 
@@ -27,7 +27,7 @@ class SessionMiddleware:
         same_site: typing.Literal["lax", "strict", "none"] = "lax",
         https_only: bool = False,
         domain: typing.Optional[str] = None,
-        redis: Redis = init_redis_client(),
+        redis: RedisClient = RedisClient(),
         payload_session_key: str = "session_key",
         scope_session_key: str = "scope_session_key",
     ) -> None:
@@ -40,7 +40,7 @@ class SessionMiddleware:
             self.security_flags += "; secure"
         if domain is not None:
             self.security_flags += f"; domain={domain}"
-        self.redis = redis
+        self.redis = redis.client
         self.payload_session_key = payload_session_key
         self.scope_session_key = scope_session_key
 

@@ -6,6 +6,8 @@
   "license": "Propietary",
   "private": true,
   "dependencies": {
-    "tailwindcss": "^1"
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
   }
 }

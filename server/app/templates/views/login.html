@@ -1,8 +1,8 @@
 {% extends "layouts/unauthenticated.html" %}
 {% block content %}
-  <div class="flex items-center justify-center text-white">
+  <div class="flex h-screen items-center justify-center text-white ">
     <div
-      class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg mt-5 shadow dark:bg-gray-800 dark:border-gray-700"
+      class="p-6 bg-white border border-gray-200 rounded-lg mt-5 w-1/2 shadow dark:bg-gray-800 dark:border-gray-700"
     >
       <form method="POST" action="{{ url_for('login') }}">
         <label
