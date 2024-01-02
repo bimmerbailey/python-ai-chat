@@ -1,18 +1,15 @@
 from datetime import datetime, timedelta
 from typing import Annotated, Optional
 
-from fastapi import Cookie, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
-from redis.asyncio import Redis
 
 from app.config.settings import jwt_settings
 from app.crud.users import user as user_crud
-from app.dependencies.session import CookieAuth, init_redis_client
+from app.dependencies.session import CookieAuth
 from app.models.users import Users
 from app.schemas.users import TokenData
 
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 oauth2_scheme = CookieAuth(token_url="/api/login")
 
 SECRET_KEY = jwt_settings.secret_key
@@ -46,7 +43,6 @@ def verify_access_token(token: str, credentials_exception):
 
 async def get_current_user(
     header_token: Annotated[Optional[str], Depends(oauth2_scheme)],
-    redis: Annotated[Redis, Depends(init_redis_client)],
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,10 +50,6 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     token = verify_access_token(header_token, credentials_exception)
-    session_user = await redis.get(token.id)
-    if session_user:
-        return Users.model_validate_json(session_user)
-    # auth_user = await crud.users.user.get_one(token.id)
     return await user_crud.get_one(token.id)
 
 

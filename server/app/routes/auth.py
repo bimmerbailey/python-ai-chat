@@ -5,14 +5,12 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from redis.asyncio import Redis
 from starlette.responses import RedirectResponse
 
 from app.config.settings import app_settings, jwt_settings
 from app.crud.users import user
 from app.dependencies.auth import create_access_token, get_current_user
 from app.dependencies.crypt import verify
-from app.dependencies.session import init_redis_client
 from app.models.users import Users
 from app.schemas.users import Token, UserBase
 
@@ -22,8 +20,6 @@ logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
 
 @router.post("/login", response_model=Token)
 async def login(
-    # FIXME: We don't want to "init_redis_client" this every time
-    redis: Annotated[Redis, Depends(init_redis_client)],
     user_credentials: OAuth2PasswordRequestForm = Depends(),
 ):
     auth_user = await user.get_by_email(user_credentials.username)
@@ -55,11 +51,6 @@ async def login(
         domain=app_settings.url_base,
         httponly=True,
         secure=True,
-    )
-    await redis.set(
-        str(auth_user.id),
-        json.dumps(auth_user.model_dump_json()),
-        3600,
     )
     return response
 

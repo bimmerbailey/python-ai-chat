@@ -47,11 +47,14 @@ async def close_redis_client(client: Redis):
 class RedisClient:
     _client: Redis
 
-    def __init__(self, settings: RedisSettings = Depends(get_redis_settings)):
-        self._client = init_redis_client(url=settings.redis_url)
+    def __init__(self, settings: RedisSettings = get_redis_settings()):
+        self._client = Redis.from_url(str(settings.dsn))
+        logger.info("Connected to Redis!")
 
     async def close(self):
-        await close_redis_client(self._client)
+        logger.info("Closing connection to Redis...")
+        await self._client.aclose()
+        logger.info("Connection closed!")
 
     def __call__(self) -> Redis:
         return self.client

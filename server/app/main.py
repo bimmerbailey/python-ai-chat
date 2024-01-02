@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config.logging import setup_fastapi, setup_logging
 from app.config.settings import AppSettings, get_app_settings
 from app.database.init_db import close_mongo_connection, connect_to_mongo
-from app.dependencies.session import close_redis_client, init_redis_client
+from app.dependencies.session import RedisClient
 from app.routes.auth import router as auth_router
 from app.routes.chat import chat_router
 from app.routes.ingest import router as ingest_router
@@ -20,10 +20,10 @@ logger = structlog.stdlib.get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db_client = await connect_to_mongo()
-    redis_client = await init_redis_client()
+    red = RedisClient()
     yield
     await close_mongo_connection(db_client)
-    await close_redis_client(redis_client)
+    await red.close()
 
 
 def init_app(app_settings: AppSettings = get_app_settings()):
