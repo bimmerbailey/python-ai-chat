@@ -1,35 +1,6 @@
 version: '3.8'
 
 services:
-  
-  server:
-    build:
-      context: ./server
-      target: development
-    environment:
-      - FASTAPI_ENV=dev
-    depends_on:
-      - mongo
-      - redis
-      - milvus-db
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./server/app:/backend/app"
-      - "./server/tests:/backend/tests"
-      - "./server/development:/backend/development"
-  
-  frontend:
-    build: 
-      context: ./frontend
-      target: development
-    volumes:
-      - "./frontend/src:/frontend/src"
-      - "./frontend/public:/frontend/public"
-      - "./frontend/vite.config.ts:/frontend/vite.config.ts"
-    ports:
-      - "3000:3000"
-  
   mongo:
     image: mongo:6.0.5
     environment:
