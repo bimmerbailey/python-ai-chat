@@ -18,7 +18,7 @@ import { mdiRobotOutline } from '@mdi/js'
         main
       />
       <div class="grid sm:grid-cols-3 md:grid-cols-12 gap-4 min-h-screen">
-        <document-list class="md:col-span-3 sm:col-span-3 overflow-auto" />
+        <document-list class="md:col-span-3 sm:col-span-3" />
         <chat-box class="md:col-span-9 sm:col-span-3" />
       </div>
     </section-main>

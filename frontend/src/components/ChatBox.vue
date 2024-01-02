@@ -16,6 +16,13 @@ const sendMessage = () => {
   })
 }
 
+const streamMessage = async () => {
+  console.log('Should be streaming now')
+  chatStore.streamMessage().catch((err) => {
+    console.error(err)
+  })
+}
+
 const { chatHistory, newMessage, useContext } = storeToRefs(chatStore)
 
 const clearMessages = () => {
@@ -35,9 +42,10 @@ const clearMessages = () => {
       ]"
       v-model="useContext"
       type="radio"
+      class="pb-2"
     />
-    <div class="bg-gray-500 rounded p-2 size-40">
-      <div v-for="message in chatHistory">
+    <div class="bg-gray-500 rounded p-2 min-h-72">
+      <div v-for="message in chatHistory" :key="message.content">
         <chat-messages :text="message.content" :author="message.role" />
       </div>
     </div>
@@ -54,6 +62,13 @@ const clearMessages = () => {
             type="submit"
             color="info"
             label="Submit"
+            class="col-span-2"
+          />
+          <base-button
+            @click="streamMessage"
+            type="submit"
+            color="info"
+            label="Stream"
             class="col-span-2"
           />
           <base-button @click="clearMessages" label="Clear" />
