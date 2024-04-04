@@ -17,10 +17,10 @@ from llama_index.core.ingestion import run_transformations
 from llama_index.core.schema import BaseNode, Document, TransformComponent
 from llama_index.core.storage import StorageContext
 
-from app.dependencies.components.ingest_helper import IngestionHelper
-from app.dependencies.components.eta import eta
-from app.paths import local_data_path
 from app.config.settings import EmbeddingSettings, get_embeddings_settings
+from app.dependencies.components.eta import eta
+from app.dependencies.components.ingest_helper import IngestionHelper
+from app.paths import local_data_path
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,6 @@ from functools import lru_cache
 
 import structlog.stdlib
 from fastapi import Depends
-
 from llama_index.core.indices.vector_store import VectorIndexRetriever, VectorStoreIndex
 from llama_index.core.vector_stores.types import (
     FilterCondition,

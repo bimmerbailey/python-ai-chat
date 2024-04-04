@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING, Literal
 
 from llama_index.core.indices import VectorStoreIndex
 from llama_index.core.schema import NodeWithScore
-from llama_index.core.storage import StorageContext
 from llama_index.core.service_context import ServiceContext
+from llama_index.core.storage import StorageContext
 from pydantic import BaseModel, Field
 
 from app.dependencies.base import ContextFilter

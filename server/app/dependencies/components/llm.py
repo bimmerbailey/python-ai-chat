@@ -1,26 +1,25 @@
 from functools import lru_cache
 from typing import Annotated
 
+import structlog
 from fastapi import Depends
 from llama_index.core.llms.llm import LLM
 from llama_index.core.llms.mock import MockLLM
-from llama_index.llms.llama_cpp import LlamaCPP
 from llama_index.core.settings import Settings as LlamaIndexSettings
 from llama_index.core.utils import set_global_tokenizer
+from llama_index.llms.llama_cpp import LlamaCPP
 from transformers import AutoTokenizer  # type: ignore
-import structlog
 
-from app.dependencies.components.prompt_helper import get_prompt_style
 from app.config.settings import (
     AppSettings,
-    get_app_settings,
-    LLMSettings,
-    get_llm_settings,
     LlamaCPPSettings,
+    LLMSettings,
+    get_app_settings,
     get_llamacpp_settings,
+    get_llm_settings,
 )
-from app.paths import models_path, models_cache_path
-
+from app.dependencies.components.prompt_helper import get_prompt_style
+from app.paths import models_cache_path, models_path
 
 logger = structlog.stdlib.get_logger(__name__)
 

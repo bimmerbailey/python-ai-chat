@@ -2,7 +2,7 @@ from functools import lru_cache
 from typing import Literal
 
 # from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
-from pydantic import AnyHttpUrl, Field, MongoDsn, RedisDsn, BaseModel
+from pydantic import AnyHttpUrl, BaseModel, Field, MongoDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -224,7 +224,7 @@ def get_llm_settings() -> LLMSettings:
 
 def get_llamacpp_settings() -> LlamaCPPSettings:
     return LlamaCPPSettings()
- 
- 
+
+
 def get_rag_settings() -> RagSettings:
     return RagSettings()

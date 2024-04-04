@@ -1,9 +1,7 @@
 from functools import lru_cache
 
 from llama_index.core.embeddings import BaseEmbedding, MockEmbedding
-from llama_index.embeddings.huggingface import (  # type: ignore
-    HuggingFaceEmbedding,
-)
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding  # type: ignore
 
 from app.config.settings import AppSettings, get_app_settings
 from app.paths import models_cache_path

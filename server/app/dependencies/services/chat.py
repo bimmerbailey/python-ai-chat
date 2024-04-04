@@ -1,14 +1,13 @@
 from dataclasses import dataclass
 
+import structlog
 from llama_index.core.chat_engine.context import ContextChatEngine
 from llama_index.core.chat_engine.simple import SimpleChatEngine
-from llama_index.core.chat_engine.types import (
-    BaseChatEngine,
-)
+from llama_index.core.chat_engine.types import BaseChatEngine
 from llama_index.core.indices import VectorStoreIndex
 from llama_index.core.indices.postprocessor import MetadataReplacementPostProcessor
-from llama_index.core.llms.custom import ChatMessage
 from llama_index.core.llms.chatml_utils import MessageRole
+from llama_index.core.llms.custom import ChatMessage
 from llama_index.core.postprocessor import (
     SentenceTransformerRerank,
     SimilarityPostprocessor,
@@ -16,7 +15,6 @@ from llama_index.core.postprocessor import (
 from llama_index.core.storage import StorageContext
 from llama_index.core.types import TokenGen
 from pydantic import BaseModel
-import structlog
 
 from app.config.settings import RagSettings, get_rag_settings
 from app.dependencies.base import ContextFilter
@@ -28,7 +26,7 @@ from app.dependencies.components import (
     get_embeddings_component,
     get_llm_component,
     get_node_store_component,
-    get_vector_store_component
+    get_vector_store_component,
 )
 from app.dependencies.services.chunks import Chunk
 
@@ -86,7 +84,7 @@ class ChatService:
         vector_store_component: VectorStoreComponent = get_vector_store_component(),
         embedding_component: EmbeddingComponent = get_embeddings_component(),
         node_store_component: NodeStoreComponent = get_node_store_component(),
-        rag_settings: RagSettings = get_rag_settings()
+        rag_settings: RagSettings = get_rag_settings(),
     ) -> None:
         self.rag_settings = rag_settings
         self.llm_component = llm_component
@@ -126,7 +124,8 @@ class ChatService:
 
             if self.rag_settings.rerank.enabled:
                 rerank_postprocessor = SentenceTransformerRerank(
-                    model=self.rag_settings.rerank.model, top_n=self.rag_settings.rerank.top_n
+                    model=self.rag_settings.rerank.model,
+                    top_n=self.rag_settings.rerank.top_n,
                 )
                 node_postprocessors.append(rerank_postprocessor)
 

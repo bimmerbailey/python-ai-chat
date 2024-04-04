@@ -1,10 +1,10 @@
 from functools import lru_cache
 
 import structlog.stdlib
+from llama_index.core.storage.docstore import BaseDocumentStore, SimpleDocumentStore
 from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.core.storage.index_store.types import BaseIndexStore
 from llama_index.storage.docstore.redis import RedisDocumentStore
-from llama_index.core.storage.docstore import SimpleDocumentStore, BaseDocumentStore
 from llama_index.storage.index_store.redis import RedisIndexStore
 
 from app.config.settings import RedisSettings, get_redis_settings

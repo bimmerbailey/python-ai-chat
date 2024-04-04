@@ -1,13 +1,13 @@
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, AnyStr, Literal, BinaryIO
+from typing import TYPE_CHECKING, Annotated, Any, AnyStr, BinaryIO, Literal
 
 import structlog.stdlib
 from fastapi import Depends
 from llama_index.core.node_parser import SentenceWindowNodeParser
-from llama_index.core.storage import StorageContext
 from llama_index.core.schema import Document
+from llama_index.core.storage import StorageContext
 from pydantic import BaseModel, Field
 
 from app.dependencies.components import (

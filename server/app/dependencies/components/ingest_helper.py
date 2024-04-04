@@ -1,10 +1,10 @@
 from pathlib import Path
 
+import structlog
 from llama_index.core.readers import StringIterableReader
 from llama_index.core.readers.base import BaseReader
 from llama_index.core.readers.json import JSONReader
 from llama_index.core.schema import Document
-import structlog
 
 logger = structlog.stdlib.get_logger(__name__)
 

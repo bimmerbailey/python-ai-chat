@@ -3,8 +3,8 @@ import logging
 from collections.abc import Sequence
 from typing import Any, Literal
 
-from llama_index.core.llms.custom import ChatMessage
 from llama_index.core.llms.chatml_utils import MessageRole
+from llama_index.core.llms.custom import ChatMessage
 
 logger = logging.getLogger(__name__)
 
