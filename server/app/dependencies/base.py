@@ -19,9 +19,9 @@ class SingletonMetaClass(type):
         super().__init__(*args, **kwargs)
 
     def __call__(cls):
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__()
-        return cls._instances[cls]
+        if cls.__name__ not in cls._instances:
+            cls._instances[cls.__name__] = super().__call__()
+        return cls._instances[cls.__name__]
 
     @synchronized
     def __new__(cls, *args, **kwargs):

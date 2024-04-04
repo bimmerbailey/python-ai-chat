@@ -1,8 +1,8 @@
 from functools import lru_cache
 from typing import Literal
 
-from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
-from pydantic import AnyHttpUrl, Field, MongoDsn, RedisDsn
+# from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
+from pydantic import AnyHttpUrl, Field, MongoDsn, RedisDsn, BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -54,8 +54,8 @@ class MilvusSettings(BaseSettings):
     collection_name: str = "ragCollection"
     token: str = ""
     dim: int = 384
-    embedding_field: str = DEFAULT_EMBEDDING_KEY
-    doc_id_field: str = DEFAULT_DOC_ID_KEY
+    # embedding_field: str = DEFAULT_EMBEDDING_KEY
+    # doc_id_field: str = DEFAULT_DOC_ID_KEY
     similarity_metric: str = "IP"
     consistency_level: str = "Strong"
     overwrite: bool = False
@@ -99,6 +99,92 @@ class EmbeddingSettings(BaseSettings):
     )
 
 
+class LLMSettings(BaseModel):
+    mode: Literal[
+        "llamacpp", "openai", "openailike", "azopenai", "sagemaker", "mock", "ollama"
+    ]
+    max_new_tokens: int = Field(
+        256,
+        description="The maximum number of token that the LLM is authorized to generate in one completion.",
+    )
+    context_window: int = Field(
+        3900,
+        description="The maximum number of context tokens for the model.",
+    )
+    tokenizer: str = Field(
+        None,
+        description="The model id of a predefined tokenizer hosted inside a model repo on "
+        "huggingface.co. Valid model ids can be located at the root-level, like "
+        "`bert-base-uncased`, or namespaced under a user or organization name, "
+        "like `HuggingFaceH4/zephyr-7b-beta`. If not set, will load a tokenizer matching "
+        "gpt-3.5-turbo LLM.",
+    )
+    temperature: float = Field(
+        0.1,
+        description="The temperature of the model. Increasing the temperature will make the model answer more creatively. A value of 0.1 would be more factual.",
+    )
+
+
+class LlamaCPPSettings(BaseModel):
+    llm_hf_repo_id: str | None = None  # Come back to this, it wasn't optional
+    llm_hf_model_file: str | None = None  # Come back to this, it wasn't optional
+    prompt_style: Literal["default", "llama2", "tag", "mistral", "chatml"] = Field(
+        "llama2",
+        description=(
+            "The prompt style to use for the chat engine. "
+            "If `default` - use the default prompt style from the llama_index. It should look like `role: message`.\n"
+            "If `llama2` - use the llama2 prompt style from the llama_index. Based on `<s>`, `[INST]` and `<<SYS>>`.\n"
+            "If `tag` - use the `tag` prompt style. It should look like `<|role|>: message`. \n"
+            "If `mistral` - use the `mistral prompt style. It shoudl look like <s>[INST] {System Prompt} [/INST]</s>[INST] { UserInstructions } [/INST]"
+            "`llama2` is the historic behaviour. `default` might work better with your custom models."
+        ),
+    )
+
+    tfs_z: float = Field(
+        1.0,
+        description="Tail free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting.",
+    )
+    top_k: int = Field(
+        40,
+        description="Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)",
+    )
+    top_p: float = Field(
+        0.9,
+        description="Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)",
+    )
+    repeat_penalty: float = Field(
+        1.1,
+        description="Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient. (Default: 1.1)",
+    )
+
+
+class RerankSettings(BaseSettings):
+    enabled: bool = Field(
+        False,
+        description="This value controls whether a reranker should be included in the RAG pipeline.",
+    )
+    model: str = Field(
+        "cross-encoder/ms-marco-MiniLM-L-2-v2",
+        description="Rerank model to use. Limited to SentenceTransformer cross-encoder models.",
+    )
+    top_n: int = Field(
+        2,
+        description="This value controls the number of documents returned by the RAG pipeline.",
+    )
+
+
+class RagSettings(BaseModel):
+    similarity_top_k: int = Field(
+        2,
+        description="This value controls the number of documents returned by the RAG pipeline or considered for reranking if enabled.",
+    )
+    similarity_value: float = Field(
+        None,
+        description="If set, any documents retrieved from the RAG must meet a certain match score. Acceptable values are between 0 and 1.",
+    )
+    rerank: RerankSettings = RerankSettings()  # Come back to this, it wasn't optional
+
+
 mongo_settings = MongoSettings()
 jwt_settings = JwtSettings()
 app_settings = AppSettings()
@@ -130,3 +216,15 @@ def get_redis_settings() -> RedisSettings:
 @lru_cache
 def get_embeddings_settings() -> EmbeddingSettings:
     return EmbeddingSettings(mode="local")
+
+
+def get_llm_settings() -> LLMSettings:
+    return LLMSettings(mode="llamacpp")
+
+
+def get_llamacpp_settings() -> LlamaCPPSettings:
+    return LlamaCPPSettings()
+ 
+ 
+def get_rag_settings() -> RagSettings:
+    return RagSettings()

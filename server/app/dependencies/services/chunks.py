@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING, Literal
 
-from llama_index import ServiceContext, StorageContext, VectorStoreIndex
-from llama_index.schema import NodeWithScore
+from llama_index.core.indices import VectorStoreIndex
+from llama_index.core.schema import NodeWithScore
+from llama_index.core.storage import StorageContext
+from llama_index.core.service_context import ServiceContext
 from pydantic import BaseModel, Field
 
 from app.dependencies.base import ContextFilter
@@ -18,7 +20,7 @@ from app.dependencies.components import (
 from app.dependencies.services.ingest import IngestedDoc
 
 if TYPE_CHECKING:
-    from llama_index.schema import RelatedNodeInfo
+    from llama_index.core.schema import RelatedNodeInfo
 
 
 class Chunk(BaseModel):
@@ -64,6 +66,8 @@ class ChunksService:
         node_store_component: NodeStoreComponent = get_node_store_component(),
     ) -> None:
         self.vector_store_component = vector_store_component
+        self.llm_component = llm_component
+        self.embedding_component = embedding_component
         self.storage_context = StorageContext.from_defaults(
             vector_store=vector_store_component.vector_store,
             docstore=node_store_component.doc_store,
@@ -104,7 +108,8 @@ class ChunksService:
         index = VectorStoreIndex.from_vector_store(
             self.vector_store_component.vector_store,
             storage_context=self.storage_context,
-            service_context=self.query_service_context,
+            llm=self.llm_component.llm,
+            embed_model=self.embedding_component.embedding_model,
             show_progress=True,
         )
         vector_index_retriever = self.vector_store_component.get_retriever(

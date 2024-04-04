@@ -2,7 +2,8 @@ from typing import Annotated
 
 import structlog.stdlib
 from fastapi import APIRouter, Depends, Request
-from llama_index.llms import ChatMessage, MessageRole
+from llama_index.core.llms.custom import ChatMessage
+from llama_index.core.llms.chatml_utils import MessageRole
 from pydantic import BaseModel
 from starlette.responses import StreamingResponse
 

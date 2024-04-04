@@ -3,7 +3,10 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.dependencies.components.embedding import EmbeddingComponent
+from app.dependencies.components.embedding import (
+    EmbeddingComponent,
+    get_embeddings_component,
+)
 
 
 class Embedding(BaseModel):
@@ -13,7 +16,9 @@ class Embedding(BaseModel):
 
 
 class EmbeddingsService:
-    def __init__(self, embedding_component: EmbeddingComponent) -> None:
+    def __init__(
+        self, embedding_component: EmbeddingComponent = get_embeddings_component()
+    ) -> None:
         self.embedding_model = embedding_component.embedding_model
 
     def texts_embeddings(self, texts: list[str]) -> list[Embedding]:
