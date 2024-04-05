@@ -72,7 +72,7 @@ class S3Settings(BaseSettings):
 
 
 class EmbeddingSettings(BaseSettings):
-    mode: Literal["local", "openai", "sagemaker", "mock"]
+    mode: Literal["local", "openai", "sagemaker", "mock"] = "local"
     ingest_mode: Literal["simple", "batch", "parallel"] = Field(
         "simple",
         description=(
@@ -102,7 +102,7 @@ class EmbeddingSettings(BaseSettings):
 class LLMSettings(BaseModel):
     mode: Literal[
         "llamacpp", "openai", "openailike", "azopenai", "sagemaker", "mock", "ollama"
-    ]
+    ] = "llamacpp"
     max_new_tokens: int = Field(
         256,
         description="The maximum number of token that the LLM is authorized to generate in one completion.",
@@ -215,11 +215,11 @@ def get_redis_settings() -> RedisSettings:
 
 @lru_cache
 def get_embeddings_settings() -> EmbeddingSettings:
-    return EmbeddingSettings(mode="local")
+    return EmbeddingSettings()
 
 
 def get_llm_settings() -> LLMSettings:
-    return LLMSettings(mode="llamacpp")
+    return LLMSettings()
 
 
 def get_llamacpp_settings() -> LlamaCPPSettings:
