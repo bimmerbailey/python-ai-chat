@@ -1,15 +1,22 @@
 from dataclasses import dataclass
-from functools import lru_cache
 
-import structlog.stdlib
-from llama_index import ServiceContext, StorageContext, VectorStoreIndex
-from llama_index.chat_engine import ContextChatEngine, SimpleChatEngine
-from llama_index.chat_engine.types import BaseChatEngine
-from llama_index.indices.postprocessor import MetadataReplacementPostProcessor
-from llama_index.llms import ChatMessage, MessageRole
-from llama_index.types import TokenGen
+import structlog
+from llama_index.core.chat_engine.context import ContextChatEngine
+from llama_index.core.chat_engine.simple import SimpleChatEngine
+from llama_index.core.chat_engine.types import BaseChatEngine
+from llama_index.core.indices import VectorStoreIndex
+from llama_index.core.indices.postprocessor import MetadataReplacementPostProcessor
+from llama_index.core.llms.chatml_utils import MessageRole
+from llama_index.core.llms.custom import ChatMessage
+from llama_index.core.postprocessor import (
+    SentenceTransformerRerank,
+    SimilarityPostprocessor,
+)
+from llama_index.core.storage import StorageContext
+from llama_index.core.types import TokenGen
 from pydantic import BaseModel
 
+from app.config.settings import RagSettings, get_rag_settings
 from app.dependencies.base import ContextFilter
 from app.dependencies.components import (
     EmbeddingComponent,
@@ -77,21 +84,22 @@ class ChatService:
         vector_store_component: VectorStoreComponent = get_vector_store_component(),
         embedding_component: EmbeddingComponent = get_embeddings_component(),
         node_store_component: NodeStoreComponent = get_node_store_component(),
+        rag_settings: RagSettings = get_rag_settings(),
     ) -> None:
-        self.llm_service = llm_component
+        self.rag_settings = rag_settings
+        self.llm_component = llm_component
+        self.embedding_component = embedding_component
         self.vector_store_component = vector_store_component
         self.storage_context = StorageContext.from_defaults(
             vector_store=vector_store_component.vector_store,
             docstore=node_store_component.doc_store,
             index_store=node_store_component.index_store,
         )
-        self.service_context = ServiceContext.from_defaults(
-            llm=llm_component.llm, embed_model=embedding_component.embedding_model
-        )
         self.index = VectorStoreIndex.from_vector_store(
-            vector_store=vector_store_component.vector_store,
+            vector_store_component.vector_store,
             storage_context=self.storage_context,
-            service_context=self.service_context,
+            llm=llm_component.llm,
+            embed_model=embedding_component.embedding_model,
             show_progress=True,
         )
 
@@ -103,20 +111,34 @@ class ChatService:
     ) -> BaseChatEngine:
         if use_context:
             vector_index_retriever = self.vector_store_component.get_retriever(
-                index=self.index, context_filter=context_filter
+                index=self.index,
+                context_filter=context_filter,
+                similarity_top_k=self.rag_settings.similarity_top_k,
             )
+            node_postprocessors = [
+                MetadataReplacementPostProcessor(target_metadata_key="window"),
+                SimilarityPostprocessor(
+                    similarity_cutoff=self.rag_settings.similarity_value
+                ),
+            ]
+
+            if self.rag_settings.rerank.enabled:
+                rerank_postprocessor = SentenceTransformerRerank(
+                    model=self.rag_settings.rerank.model,
+                    top_n=self.rag_settings.rerank.top_n,
+                )
+                node_postprocessors.append(rerank_postprocessor)
+
             return ContextChatEngine.from_defaults(
                 system_prompt=system_prompt,
                 retriever=vector_index_retriever,
-                service_context=self.service_context,
-                node_postprocessors=[
-                    MetadataReplacementPostProcessor(target_metadata_key="window"),
-                ],
+                llm=self.llm_component.llm,  # Takes no effect at the moment
+                node_postprocessors=node_postprocessors,
             )
         else:
             return SimpleChatEngine.from_defaults(
                 system_prompt=system_prompt,
-                service_context=self.service_context,
+                llm=self.llm_component.llm,
             )
 
     def stream_chat(
@@ -190,6 +212,5 @@ class ChatService:
         return completion
 
 
-@lru_cache
 def get_chat_service() -> ChatService:
     return ChatService()
