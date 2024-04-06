@@ -6,47 +6,47 @@ import structlog
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from app.config.settings import mongo_settings
-from app.dependencies.crypt import hash_password
-from app.models.users import Users
+from app.config.settings import MongoSettings, get_mongo_settings
+from app.dependencies.auth import get_crypt_context
+from app.models.users import User
 
 logger: structlog.stdlib.BoundLogger = structlog.getLogger(__name__)
 
 
-async def connect_db():
+async def connect_db(mongo_settings: MongoSettings = get_mongo_settings()) -> None:
     kwargs = {
         "username": mongo_settings.username,
         "password": mongo_settings.password,
     }
-    client = AsyncIOMotorClient(str(mongo_settings.url), **kwargs)
-    await init_beanie(client[mongo_settings.name], document_models=[Users])
+    client = AsyncIOMotorClient(str(mongo_settings.database_url), **kwargs)
+    await init_beanie(client[mongo_settings.name], document_models=[User])
 
 
-async def create_users():
+async def create_users(crypt_context=get_crypt_context()):
     logger.info("Dropping local Users collection")
-    await Users.delete_all()
+    await User.delete_all()
 
     users = [
-        Users(
+        User(
             **{
                 "email": "admin@your-app.com",
                 "first_name": "admin",
-                "password": hash_password("password"),
+                "password": crypt_context.hash("password"),
                 "created_date": datetime.now(tz=timezone.utc),
                 "is_admin": True,
             }
         ),
-        Users(
+        User(
             **{
                 "email": "user@your-app.com",
                 "first_name": "user",
-                "password": hash_password("password"),
+                "password": crypt_context.hash("password"),
                 "created_date": datetime.now(tz=timezone.utc),
             }
         ),
     ]
 
-    await Users.insert_many(users)
+    await User.insert_many(users)
     logger.info("Users added")
 
 
