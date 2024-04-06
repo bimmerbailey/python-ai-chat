@@ -2,9 +2,10 @@ import os
 
 from huggingface_hub import hf_hub_download, snapshot_download
 
-from app.config.settings import app_settings
+from app.config.settings import get_app_settings
 from app.paths import models_cache_path, models_path
 
+app_settings = get_app_settings()
 os.makedirs(models_path, exist_ok=True)
 embedding_path = models_path / "embedding"
 

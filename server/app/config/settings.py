@@ -1,8 +1,8 @@
 from functools import lru_cache
 from typing import Literal
+import os
 
-# from llama_index.vector_stores.milvus import DEFAULT_DOC_ID_KEY, DEFAULT_EMBEDDING_KEY
-from pydantic import AnyHttpUrl, BaseModel, Field, MongoDsn, RedisDsn
+from pydantic import AnyHttpUrl, BaseModel, Field, MongoDsn, RedisDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,11 +10,15 @@ class MongoSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="mongo_")
     hostname: str = "mongo"
     port: int = 27017
-    password: str = "password"
+    password: SecretStr = "password"
     name: str = "rag_app"
     username: str = "rag_user"
 
-    url: MongoDsn = f"mongodb://{hostname}:{port}/{name}"
+    @property
+    def database_url(self) -> MongoDsn:
+        if not os.environ.get("MONGO_URL", None):
+            return MongoDsn(f"mongodb://{self.hostname}:{self.port}/{self.name}")
+        return MongoDsn(os.environ.get("MONGO_URL"))
 
 
 class JwtSettings(BaseSettings):
@@ -129,7 +133,7 @@ class LlamaCPPSettings(BaseModel):
     llm_hf_repo_id: str | None = None  # Come back to this, it wasn't optional
     llm_hf_model_file: str | None = None  # Come back to this, it wasn't optional
     prompt_style: Literal["default", "llama2", "tag", "mistral", "chatml"] = Field(
-        "llama2",
+        "mistral",
         description=(
             "The prompt style to use for the chat engine. "
             "If `default` - use the default prompt style from the llama_index. It should look like `role: message`.\n"
@@ -185,12 +189,12 @@ class RagSettings(BaseModel):
     rerank: RerankSettings = RerankSettings()  # Come back to this, it wasn't optional
 
 
-mongo_settings = MongoSettings()
-jwt_settings = JwtSettings()
-app_settings = AppSettings()
-redis_settings = RedisSettings()
-milvus_settings = MilvusSettings()
-s3_settings = S3Settings()
+def get_jwt_settings() -> JwtSettings:
+    return JwtSettings()
+
+
+def get_mongo_settings() -> MongoSettings:
+    return MongoSettings()
 
 
 @lru_cache

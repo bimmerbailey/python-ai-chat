@@ -6,20 +6,25 @@ from redis.asyncio import Redis
 
 from app.config.settings import (
     RedisSettings,
-    app_settings,
     get_redis_settings,
-    redis_settings,
+    AppSettings,
+    get_app_settings,
 )
 
 logger = structlog.get_logger(__name__)
 
 
 class CookieAuth(OAuth2PasswordBearer):
-    def __init__(self, token_url: str):
+    settings: AppSettings
+
+    def __init__(
+        self, token_url: str, settings: AppSettings = Depends(get_app_settings)
+    ):
         super().__init__(tokenUrl=token_url)
+        self.settings = settings
 
     async def __call__(self, request: Request) -> str | None:
-        authorization = request.cookies.get(app_settings.cookie_name, None)
+        authorization = request.cookies.get(self.settings.cookie_name, None)
         if not authorization:
             if self.auto_error:
                 raise HTTPException(
@@ -31,9 +36,9 @@ class CookieAuth(OAuth2PasswordBearer):
         return authorization
 
 
-def init_redis_client(url: RedisDsn = redis_settings.dsn) -> Redis:
-    logger.info("Connecting to Redis...", db=url)
-    client = Redis.from_url(str(url))
+def init_redis_client(redis: RedisSettings = get_redis_settings()) -> Redis:
+    logger.info("Connecting to Redis...", db=redis.dsn)
+    client = Redis.from_url(str(redis.dsn))
     logger.info("Connected to Redis!")
     return client
 
