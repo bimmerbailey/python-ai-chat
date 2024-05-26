@@ -1,71 +1,70 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 
-from app.config.settings import jwt_settings
-from app.crud.users import user as user_crud
-from app.dependencies.session import CookieAuth
-from app.models.users import Users
+from app.config.settings import JwtSettings, get_jwt_settings
+from app.models.users import User
 from app.schemas.users import TokenData
 
-oauth2_scheme = CookieAuth(token_url="/api/login")
-
-SECRET_KEY = jwt_settings.secret_key
-ALGORITHM = jwt_settings.algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES = jwt_settings.token_expires
+logging.getLogger("passlib").setLevel(logging.ERROR)
 
 
-def create_access_token(data: dict):
+def get_crypt_context() -> CryptContext:
+    return CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
+
+
+def create_access_token(
+    data: dict, settings: Annotated[JwtSettings, Depends(get_jwt_settings)]
+):
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=settings.token_expires)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key.get_secret_value(), algorithm=settings.algorithm
+    )
 
     return encoded_jwt
 
 
-def verify_access_token(token: str, credentials_exception):
+def verify_access_token(
+    token: str, settings: Annotated[JwtSettings, Depends(get_jwt_settings)]
+) -> Optional[TokenData]:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key.get_secret_value(), algorithms=settings.algorithm
+        )
         user_id: str = payload.get("user_id")
         if user_id is None:
-            raise credentials_exception
+            return None
         token_data = TokenData(id=user_id)
     except JWTError:
-        raise credentials_exception
-
+        return None
     return token_data
 
 
 async def get_current_user(
-    header_token: Annotated[Optional[str], Depends(oauth2_scheme)],
-):
+    settings: Annotated[JwtSettings, Depends(get_jwt_settings)],
+    header_token: Optional[str] = Depends(oauth2_scheme),
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f"Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    token = verify_access_token(header_token, credentials_exception)
-    return await user_crud.get_one(token.id)
-
-
-def get_current_active_user(
-    current_user: Users = Depends(get_current_user),
-) -> Users:
-    if not user_crud.is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
-def get_current_active_superuser(
-    current_user: Users = Depends(get_current_user),
-) -> Users:
-    if not user_crud.is_admin(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return current_user
+    token = verify_access_token(header_token, settings)
+    if not token:
+        raise credentials_exception
+    user = await User.get(token.id)
+    if not user:
+        raise credentials_exception
+    return user

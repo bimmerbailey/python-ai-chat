@@ -22,18 +22,10 @@ from app.dependencies.components import (
     get_node_store_component,
     get_vector_store_component,
 )
-from app.paths import local_data_path
 
 if TYPE_CHECKING:
     from llama_index.core.storage.docstore.types import RefDocInfo
 
-# Patching the default file reader to support other file types
-# FILE_READER_CLS = DEFAULT_FILE_READER_CLS.copy()
-# FILE_READER_CLS.update(
-#     {
-#         ".json": JSONReader,
-#     }
-# )
 
 logger = structlog.stdlib.get_logger(__name__)
 

@@ -1,5 +1,5 @@
 """
-Copyright 2023 https://github.com/imartinez/privateGPT
+Copyright 2024 https://github.com/zylon-ai/private-gpt
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
