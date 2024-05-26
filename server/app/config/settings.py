@@ -43,7 +43,7 @@ class AppSettings(BaseSettings):
 
 
 class RedisSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="redis_")
+    model_config = SettingsConfigDict(env_prefix="REDIS_")
 
     host: str = "redis"
     port: int = 6379
@@ -51,13 +51,13 @@ class RedisSettings(BaseSettings):
 
 
 class MilvusSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="milvus_")
+    model_config = SettingsConfigDict(env_prefix="MILVUS_")
 
     uri: AnyHttpUrl = "http://milvus-db"
     hostname: str = str(uri).split("/")[-1]
     collection_name: str = "ragCollection"
     token: str = ""
-    dim: int = 384
+    dim: int = 768
     # embedding_field: str = DEFAULT_EMBEDDING_KEY
     # doc_id_field: str = DEFAULT_DOC_ID_KEY
     similarity_metric: str = "IP"
@@ -67,7 +67,7 @@ class MilvusSettings(BaseSettings):
 
 
 class S3Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="s3_")
+    model_config = SettingsConfigDict(env_prefix="S3_")
 
     uri: AnyHttpUrl = "http://minio:9000"
     bucket: str = "a-bucket"
@@ -76,7 +76,7 @@ class S3Settings(BaseSettings):
 
 
 class EmbeddingSettings(BaseSettings):
-    mode: Literal["local", "openai", "sagemaker", "mock"] = "local"
+    mode: Literal["huggingface", "openai", "sagemaker", "mock", "ollama"] = "ollama"
     ingest_mode: Literal["simple", "batch", "parallel"] = Field(
         "simple",
         description=(
@@ -106,7 +106,7 @@ class EmbeddingSettings(BaseSettings):
 class LLMSettings(BaseModel):
     mode: Literal[
         "llamacpp", "openai", "openailike", "azopenai", "sagemaker", "mock", "ollama"
-    ] = "llamacpp"
+    ] = "ollama"
     max_new_tokens: int = Field(
         256,
         description="The maximum number of token that the LLM is authorized to generate in one completion.",
@@ -189,6 +189,57 @@ class RagSettings(BaseModel):
     rerank: RerankSettings = RerankSettings()  # Come back to this, it wasn't optional
 
 
+class OllamaSettings(BaseModel):
+    api_base: str = Field(
+        "http://192.168.0.235:11434",
+        description="Base URL of Ollama API. Example: 'https://localhost:11434'.",
+    )
+    embedding_api_base: str = Field(
+        "http://192.168.0.235:11434",
+        description="Base URL of Ollama embedding API. Example: 'https://localhost:11434'.",
+    )
+    llm_model: str = Field(
+        "llama3",
+        description="Model to use. Example: 'llama2-uncensored'.",
+    )
+    embedding_model: str = Field(
+        'nomic-embed-text',
+        description="Model to use. Example: 'nomic-embed-text'.",
+    )
+    keep_alive: str = Field(
+        "5m",
+        description="Time the model will stay loaded in memory after a request. examples: 5m, 5h, '-1' ",
+    )
+    tfs_z: float = Field(
+        1.0,
+        description="Tail free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting.",
+    )
+    num_predict: int = Field(
+        None,
+        description="Maximum number of tokens to predict when generating text. (Default: 128, -1 = infinite generation, -2 = fill context)",
+    )
+    top_k: int = Field(
+        40,
+        description="Reduces the probability of generating nonsense. A higher value (e.g. 100) will give more diverse answers, while a lower value (e.g. 10) will be more conservative. (Default: 40)",
+    )
+    top_p: float = Field(
+        0.9,
+        description="Works together with top-k. A higher value (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. (Default: 0.9)",
+    )
+    repeat_last_n: int = Field(
+        64,
+        description="Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)",
+    )
+    repeat_penalty: float = Field(
+        1.1,
+        description="Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient. (Default: 1.1)",
+    )
+    request_timeout: float = Field(
+        120.0,
+        description="Time elapsed until ollama times out the request. Default is 120s. Format is float. ",
+    )
+
+
 def get_jwt_settings() -> JwtSettings:
     return JwtSettings()
 
@@ -232,3 +283,7 @@ def get_llamacpp_settings() -> LlamaCPPSettings:
 
 def get_rag_settings() -> RagSettings:
     return RagSettings()
+
+
+def get_ollama_settings() -> OllamaSettings:
+    return OllamaSettings()

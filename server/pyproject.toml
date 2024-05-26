@@ -33,6 +33,8 @@ llama-index-embeddings-huggingface = "^0.2.0"
 llama-index-core = "^0.10.26"
 llama-index-storage-docstore-redis = "^0.1.2"
 llama-index-storage-index-store-redis = "^0.1.2"
+llama-index-llms-ollama = "^0.1.4"
+llama-index-embeddings-ollama = "^0.1.2"
 
 
 [tool.poetry.group.dev.dependencies]
